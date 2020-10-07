@@ -1,0 +1,2 @@
+class CreatPlayPlanActivity:
+    pass

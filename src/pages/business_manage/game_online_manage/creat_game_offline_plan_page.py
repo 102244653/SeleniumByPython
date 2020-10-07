@@ -1,0 +1,2 @@
+class CreatOfflinePlanActivity:
+    pass

@@ -1,0 +1,2 @@
+class CreatOnlinePlanActivity:
+    pass

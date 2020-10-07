@@ -1,0 +1,12 @@
+/log/
+/report/
+/result/
+/screenshot/
+/src/cases/__pycache__/
+/src/cases/failures
+/.idea
+/__pycache__/
+/src/cases/conftest.py
+/src/config/config.ini
+/src/cases/allure
+/venv

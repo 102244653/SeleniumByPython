@@ -1,0 +1,2 @@
+class CreatChangePlanActivity:
+    pass
