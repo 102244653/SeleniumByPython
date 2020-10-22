@@ -100,7 +100,7 @@ class BaseMethod:
         :return:
         '''
         try:
-            ele = WebDriverWait(self.driver, timeout, 1).until(EC.presence_of_element_located(locator))
+            ele = WebDriverWait(self.driver, timeout, 1).until(EC.visibility_of_element_located(locator))
         except Exception as e:
             print(e)
             return False
@@ -191,7 +191,10 @@ class BaseMethod:
             el = self.get_element(locator)
         else:
             el = locator
-        self.clear_text(el)
+        try:
+            self.clear_text(el)
+        except:
+            pass
         el.send_keys(text)
 
     def get_ele_attr(self, locator, attr_name):
@@ -417,6 +420,44 @@ class BaseMethod:
         :return:
         """
         self.driver.switch_to_default_content()
+
+    def focus_on_element(self, locator):
+        """
+        焦点移动到某个元素上
+        :param locator:
+        :return:
+        """
+        if isinstance(locator, tuple):
+            ele = self.get_element(locator)
+        else:
+            ele = locator
+        self.driver.execute_script("arguments[0].focus();", ele)
+
+    def change_element_attr(self, locator, attr=()):
+        """
+        修改元素属性
+        :param locator:
+        :param attr:
+        :return:
+        """
+        if isinstance(locator, tuple):
+            ele = self.get_element(locator)
+        else:
+            ele = locator
+        self.driver.execute_script("arguments[0].setAttribute(arguments[1],arguments[2])", ele, attr[1], attr[2])
+
+    def delete_element_attr(self, locator, attr):
+        """
+        移除元素属性
+        :param locator:
+        :param attr:
+        :return:
+        """
+        if isinstance(locator, tuple):
+            ele = self.get_element(locator)
+        else:
+            ele = locator
+        self.driver.execute_script("arguments[0].removeAttribute(arguments[1])", ele, attr)
 
     # 向一个认证的对话框发送用户名和密码，会自动点击确认
     # driver.switch_to.alert.authenticate('cheese','secretGouda')
