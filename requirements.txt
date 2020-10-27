@@ -1,7 +1,9 @@
 selenium==3.14.1
-cx_Oracle
+#cx_Oracle
 pytest
-pytest-repeat==0.8.0
-pytest-rerunfailures==8.0
-pytest-ordering==0.6
+pytest-repeat
+pytest-rerunfailures
+pytest-ordering
 allure-pytest
+pyperclip
+pyautogui
