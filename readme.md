@@ -33,6 +33,7 @@
 # 运行环境
     python 3.6+
     slenium>=3.14.1
+    pytest  【学习地址：https://www.cnblogs.com/luizyao/p/11771740.html】
 
 # 启动参数说明
     参数格式：--cmd_env=test --cmd_browser=chrome --cmd_dr=local 
