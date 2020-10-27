@@ -1,6 +1,5 @@
 import time
 
-import pyperclip
 from selenium.webdriver.common.keys import Keys
 
 from vlt_path import get_path
@@ -128,7 +127,7 @@ class BasePage(BaseMethod):
         提示弹窗确认
         :return:
         """
-        alert = ('xpath', '//div[@aria-label="{}"]/div/div[3]/button[1]'.format(alter_name))
+        alert = ('xpath', '//div[@aria-label="{}"]/div/div[3]/button[2]'.format(alter_name))
         if self.wait_exist(alert):
             self.click_element(alert)
         else:
@@ -274,32 +273,32 @@ class BasePage(BaseMethod):
         else:
             print('未查找到{}按钮'.format(btn_name))
 
-    def do_upload_window(self, astr='None'):
+    def do_upload_window(self, path=None):
         """
         上传文件弹窗处理
-        python的剪切板操作，先传入一个值写入剪切板然后进行粘贴,在点击确认按钮
-        :param astr:
+        使用pyautogui操作，在github下载安装包后安装：python setup.py install
+        下载地址： https://github.com/asweigart/pyautogui
+        :param path:
         :return:
         """
         time.sleep(2)
-        pyperclip.copy(astr)
-        pyperclip.paste()
-        self.driver.send_keys(Keys.ENTER)
-        self.loading()
-
+        import pyautogui
+        if path:
+            pyautogui.write(path)
+            pyautogui.press('enter', presses=2)  # enter按两次，第一次结束输入，第二次提交
+            self.loading()
 
     def get_search_count(self):
         """
-            获取搜索记录数(通用)
+        获取搜索记录数(通用)
         :return:
         """
         search_count = ('css', 'div[class="search-bar-comp"]>div>p>span>em')
         return self.get_element(search_count).text
 
-
     def click_button_contain_of_id(self, part_id="detail", postion=2, isload=False):
         """
-            点击包含Id的按钮
+        点击包含Id的按钮
         :param part_id: add,delete,edit,detail 等等按钮。 （注意是button类且包含id的按钮）
         :param postion: 默认出现二个同ID元素的比较多
         :param isload: 等待加载
@@ -311,3 +310,20 @@ class BasePage(BaseMethod):
             self.loading()
         else:
             time.sleep(2)
+
+    def select_not_input_list(self, locator, times):
+        """
+        选择无法输入的下拉框，通过按down的次数控制选择
+        :param locator:
+        :param times:
+        :return:
+        """
+        self.delete_element_attr(locator, 'readonly')
+        ele = self.get_element(locator)
+        ele.click()
+        time.sleep(1)
+        for i in range(times):
+            ele.send_keys(Keys.DOWN)
+            time.sleep(1)
+        ele.send_keys(Keys.ENTER)
+        time.sleep(1)
