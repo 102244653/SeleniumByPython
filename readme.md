@@ -162,10 +162,5 @@
 # 测试报告邮件
     jenkins新建任务使用src/common/send_email.py文件发送即可
     
-# 地址管理
-    jenkin电脑：10.36.0.68
-    jenkins地址：http://10.36.0.68:8080/   账号：tester   密码：123456
-    jenkins启动方式：java -jar E:\jenkins\jenkins.war
-    邮件报告地址：http://10.36.0.68:8989/id/   [需要启动Nginx服务，目录：E:\nginx]
-    gitlab地址: http://10.13.0.176/    
+
     
