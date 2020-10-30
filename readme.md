@@ -20,7 +20,6 @@
                                             【此文件未增减字段不建议上传gitlab，本地管理即可】
                 config.py:                  用于管理项目的全局变量，暂未使用到
                 readconfig.py:              用于读取config.ini的配置
-            [db]:                           数据库操作，暂未使用
             [pages]:
                 [页面管理目录]:               用于保存页面的元素和页面操作方法，按模块分层管理
                 base_page.py:               用于管理项目公共方法，所有页面需要继承 base_page
@@ -28,7 +27,89 @@
         requestments:                       用于管理用到的python库
         vlt_path.py:                        用于读取项目根目录，项目所有路径均使用此方法读取根目录后拼接 
 
-注意：*开头的文件或者目录默认不自动上传git，修改后需要手动上传
+注意：
+
+1.以*开头的文件或者目录默认不自动上传git，修改后需要手动上传
+
+2.动手之前请先查看common/base_method.py和pages/base_page.py两个文件
+
+# Page页面介绍
+    以admin_page为例：
+    
+    class AdminActivity:   # 元素管理，以元祖的方式保存，支持定位方式在base_method里面的get_element_by_type定义
+
+    username = ('xpath', '//*[starts-with(@placeholder,"请输入用户账号")]')
+    display_pw = ('css', "i.iconfont.icon-mima-bukan")
+    password = ('xpath', '//*[starts-with(@placeholder,"请输入用户密码")]')
+    verify_code = ('xpath', '//*[starts-with(@placeholder,"请输入验证码")]')
+    login_btn = ('xpath', '//div[@class="registerPwd"]//button')
+    platform_name = ('css', '//div[@class="hd-logo"]//strong[@class="name"]')
+
+    global page   # 申明全局变量:AdminActivity的实例对象
+
+
+    class AdminPage(BasePage):   # 测试页面必须继承BasePage（或者BaseMethod）
+
+        def __init__(self, driver):    
+            super().__init__(driver)    # 执行base_method的init方法
+            global page
+            page = AdminActivity()      # 实例化AdminActivity
+
+        def login(self, username, password):    # 写页面操作方法
+            self.send_keys(page.username, username)
+            self.click_element(page.display_pw)
+            self.send_keys(page.password, password)
+            self.send_keys(page.verify_code, '1108')
+            self.click_element(page.login_btn)
+            time.sleep(5)
+            if self.wait_not_exist(page.logout_btn):
+                raise Exception('登录失败')
+                
+# Case用例
+    
+    global over_view_page, admin_page   # 声明全局变量共全局调用，变量为需要操作的页面
+    
+    
+    @pytest.mark.usefixtures('user_login')   # 调用conftest.py中user_login的方法
+    @pytest.mark.usefixtures('init_browser')    # 调用conftest.py中init_browser返回的driver对象
+    @allure.story("概况")
+    class TestOverView:    # 用例类型需要以Test开头
+    
+        @pytest.fixture(scope='function')   #前置操作，实例化页面对象并打开菜单列表
+        def set_up(self):
+            """
+            前置操作
+            :return:
+            """
+            global over_view_page, admin_page
+            over_view_page = OverViewPage(self.driver)
+            admin_page = AdminPage(self.driver)
+    
+            admin_page.into_subsystem('业务管理')
+    
+        @pytest.fixture(autouse=True, scope='function')   # 后置操作，关闭浏览器弹窗，不受用例执行结果的影响
+        def close_open_menu(self):
+            """
+            后置操作，关闭当前菜单
+            :return:
+            """
+            yield 1   #  后置操作必须添加此行， yield [为真即可]
+            admin_page.close_current_menu()
+    
+        @pytest.mark.home
+        @pytest.mark.run(order=1)
+        def test_check_wait_confirm(self, set_up, close_open_menu):  # 编写用例，以test开头或结尾，将前置后置函数名称以参数形式传入即可
+            """
+            检查待审核：
+            1.点击 待审核 图标
+            【check_point】当前菜单窗口标题==我的待办
+            :return:
+            """
+            admin_page.select_menu('概况')
+            over_view_page.click_wait_confirm()
+            assert over_view_page.check_current_menu('我的待办'), "点击 【待审核】 未跳转至 我的待办"
+            toast = over_view_page.read_toast()
+            assert toast == '', '检查到错误提示信息：'+toast
 
 # 运行环境
     python 3.6+
@@ -86,5 +167,5 @@
     jenkins地址：http://10.36.0.68:8080/   账号：tester   密码：123456
     jenkins启动方式：java -jar E:\jenkins\jenkins.war
     邮件报告地址：http://10.36.0.68:8989/id/   [需要启动Nginx服务，目录：E:\nginx]
-    
+    gitlab地址: http://10.13.0.176/    
     
